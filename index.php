@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 class NestedTree
 {
+    const CAT_ID_DONT_EXIST = 'Dla podanego id brak kategorii na liscie';
     protected $tree;
     protected $list;
 
@@ -11,22 +13,25 @@ class NestedTree
         $this->list = json_decode(file_get_contents($list), true);
     }
 
-    public function execute()
+    /**
+     * @return array
+     */
+    public function execute(): array
     {
         return $this->iteratNode($this->tree);
     }
 
-    private function iteratNode($arr)
+    /**
+     * @param array $arr
+     * @return array
+     */
+    private function iteratNode(array $arr): array
     {
         foreach ($arr as $key => $value) {
             if (!empty($value) && $value['id']) {
-                $arr[$key]['name'] = $value['id'];
-                foreach ($this->list as $list) {
-                    if ($list['category_id'] == $value['id']) {
-                        $arr[$key]['name'] = $list['translations']['pl_PL']['name'];
-
-                    }
-                }
+                $arr[$key]['name'] = array_values(array_filter($this->list, function($list) use ($value) {
+                    return $list['category_id'] == $value['id'];
+                }))[0]['translations']['pl_PL']['name'] ?? self::CAT_ID_DONT_EXIST;
             }
 
             if (is_array($value) && !empty($value)) {
