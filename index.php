@@ -7,7 +7,12 @@ class NestedTree
     protected $tree;
     protected $list;
 
-    public function __construct($tree, $list)
+    /**
+     * NestedTree constructor.
+     * @param string $tree
+     * @param string $list
+     */
+    public function __construct(string $tree, string $list)
     {
         $this->tree = json_decode(file_get_contents($tree), true);
         $this->list = json_decode(file_get_contents($list), true);
